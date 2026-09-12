@@ -67,10 +67,12 @@
 
 ```sql
 clients (
-  id          uuid primary key,
-  user_id     uuid not null references auth.users(id),
-  name        text not null,
-  created_at  timestamptz not null default now(),
+  id           uuid primary key,
+  user_id      uuid not null references auth.users(id),
+  name         text not null,
+  use_count    int  not null default 1,   -- 驱动客户磁贴排序
+  last_used_at timestamptz not null default now(),
+  created_at   timestamptz not null default now(),
   unique (user_id, name)          -- 自学习磁贴去重
 )
 
@@ -174,6 +176,7 @@ where wr.expected_amount > coalesce(p.paid_amount, 0);
 - `work_records (user_id, client_id)`
 - `payments (user_id, work_record_id)`
 - `locations (user_id, last_used_at desc)`
+- `clients (user_id, last_used_at desc)`
 
 RLS：每张表 `using (auth.uid() = user_id)` + 同样的 `with check`，用户之间完全隔离。
 
@@ -420,7 +423,9 @@ Supabase 真实连接（CI 无凭证）、视觉快照（维护成本高、收�
 2. 把未入 git 的 `spark-output/` 与嵌套 `freelance-tracker/freelance-tracker/` 原型稿一并纳入该分支
 3. 打 tag `archive-v1`，切回 master 保持原样
 
-Supabase：确认能否复用旧项目 `.env.local` 里的同一实例，避免重新建项目；但表结构全新设计（多笔收款是新模型），需新迁移文件，且不得与旧 `001_initial_schema.sql` 的表名冲突。
+Supabase：**新建一个独立的 Supabase 项目**（2026-09-12 已确认）。原因是旧迁移已在 `public` schema 建了 `profiles` / `clients` / `projects` / `work_records` 四张表，其中 `clients` 和 `work_records` 与新设计同名但字段结构完全不同（旧 `clients` 有 contact/notes 无 use_count；旧 `work_records` 是单金额模型、无多笔收款）。新建项目零冲突，旧数据完整保留。
+
+新项目凭证写入 `yiji/.env.local`（已被 `.gitignore` 的 `.env.*` 规则覆盖，不会入库），`yiji/.env.example` 提供占位模板。
 
 ---
 
