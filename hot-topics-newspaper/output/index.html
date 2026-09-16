@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热点日报 · THE DAILY SCOOP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=UnifrakturMaguntia&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ==================== RESET ==================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; }
+        body { min-height: 100vh; transition: background 0.4s, color 0.4s; }
+        a { text-decoration: none; color: inherit; }
+        a:hover { text-decoration: underline; }
+
+        /* ==================== THEME SWITCHER ==================== */
+        .theme-switch {
+            position: fixed; top: 16px; right: 16px; z-index: 9999;
+            display: flex; gap: 3px; padding: 3px; border-radius: 6px;
+        }
+        .theme-switch button {
+            padding: 7px 14px; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 12px; font-weight: 700;
+            letter-spacing: 0.5px; transition: all 0.2s;
+        }
+
+        /* ================================================================
+           VINTAGE THEME — 1940s American Newspaper
+           ================================================================ */
+        body.vintage {
+            background: #e8dcc8;
+            color: #1a1410;
+            font-family: 'Noto Serif SC', 'SimSun', 'STSong', Georgia, serif;
+        }
+        body.vintage::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 25%, rgba(170,140,90,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 75%, rgba(150,120,70,0.12) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(190,160,110,0.06) 0%, transparent 60%);
+            pointer-events: none; z-index: 0;
+        }
+        body.vintage .theme-switch {
+            background: rgba(26,20,16,0.9);
+            backdrop-filter: blur(8px);
+        }
+        body.vintage .theme-switch button {
+            background: transparent; color: #b8a88a;
+        }
+        body.vintage .theme-switch button.active {
+            background: rgba(184,168,138,0.25); color: #f0e6d4;
+        }
+        body.vintage .theme-switch button:hover { color: #f0e6d4; }
+        body.vintage .modern-page { display: none !important; }
+
+        .vintage-page {
+            position: relative; z-index: 1;
+            max-width: 1060px; margin: 0 auto;
+            padding: 24px 36px 48px;
+        }
+
+        /* --- Masthead --- */
+        .v-topbar {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            font-size: 11px; color: #6a5e50; font-style: italic;
+            padding-bottom: 6px; border-bottom: 1px solid #6a5e50;
+        }
+        .v-topbar-left, .v-topbar-right { display: flex; gap: 16px; }
+        .v-topbar .v-weather { font-style: normal; }
+
+        .v-masthead {
+            text-align: center; padding: 10px 0 6px;
+        }
+        .v-masthead-title {
+            font-family: 'UnifrakturMaguntia', 'STKaiti', 'KaiTi', cursive;
+            font-size: clamp(3.2rem, 7vw, 5.8rem);
+            line-height: 1; letter-spacing: 3px;
+            color: #1a1410;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.08);
+        }
+        .v-masthead-tagline {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 12px; font-style: italic;
+            letter-spacing: 4px; color: #6a5e50;
+            margin-top: 2px;
+        }
+
+        .v-info-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 6px 0;
+            border-top: 3px solid #1a1410;
+            border-bottom: 1px solid #1a1410;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 11px; color: #5a4e40;
+        }
+        .v-info-bar span { letter-spacing: 1px; }
+        .v-info-bar .v-date-center {
+            font-weight: 700; font-size: 13px; color: #1a1410;
+            text-transform: uppercase; letter-spacing: 3px;
+        }
+
+        /* --- Banner --- */
+        .v-banner {
+            text-align: center; padding: 8px 0;
+            border-bottom: 2px solid #1a1410;
+            margin-bottom: 16px;
+        }
+        .v-banner-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 13px; font-weight: 900;
+            letter-spacing: 8px; text-transform: uppercase;
+            color: #8b1a1a;
+        }
+
+        /* --- Lead Headline (full width) --- */
+        .v-lead {
+            text-align: center; padding: 12px 0 14px;
+            border-bottom: 1px solid #8a7a66;
+            margin-bottom: 16px;
+        }
+        .v-lead-kicker {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: #8b1a1a; margin-bottom: 6px;
+        }
+        .v-lead-headline {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900; line-height: 1.2;
+            color: #1a1410;
+            max-width: 800px; margin: 0 auto 8px;
+        }
+        .v-lead-headline a { color: inherit; }
+        .v-lead-headline a:hover { color: #8b1a1a; text-decoration: none; }
+        .v-lead-sub {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 14px; font-style: italic;
+            color: #5a4e40; max-width: 600px; margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* --- Section Headers --- */
+        .v-section-rule {
+            display: flex; align-items: center; gap: 12px;
+            margin: 20px 0 12px; padding-top: 8px;
+            border-top: 3px solid #1a1410;
+        }
+        .v-section-rule::after {
+            content: ''; flex: 1; height: 1px; background: #8a7a66;
+        }
+        .v-section-title {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+            font-size: 16px; font-weight: 900;
+            letter-spacing: 6px; text-transform: uppercase;
+            white-space: nowrap; color: #1a1410;
+        }
+        .v-section-subtitle {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 10px; font-style: italic;
+            color: #8a7a66; letter-spacing: 1px;
+            margin-left: 4px; white-space: nowrap;
+        }
+
+        /* --- Multi-Column Grid --- */
+        .v-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 0;
+        }
+        .v-col {
+            padding: 0 14px;
+            border-right: 1px solid #b8a88a;
+        }
+        .v-col:first-child { padding-left: 0; }
+        .v-col:last-child { border-right: none; padding-right: 0; }
+
+        /* --- Article Styles --- */
+        .v-article { margin-bottom: 14px; }
+        .v-article + .v-article {
+            padding-top: 10px;
+            border-top: 1px dotted #b8a88a;
+        }
+
+        .v-article-headline {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+            font-weight: 700; line-height: 1.3;
+            color: #1a1410; margin-bottom: 4px;
+        }
+        .v-article-headline a { color: inherit; }
+        .v-article-headline a:hover { color: #8b1a1a; text-decoration: none; }
+
+        .v-article-body {
+            font-size: 13px; line-height: 1.65;
+            color: #3a3028; text-align: justify;
+            hyphens: auto;
+        }
+
+        .v-article-meta {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 10px; font-style: italic;
+            color: #8a7a66; margin-top: 3px;
+        }
+
+        /* Lead article in column */
+        .v-article.lead .v-article-headline {
+            font-size: 20px;
+        }
+        .v-article.lead .v-article-body {
+            font-size: 13.5px;
+        }
+        .v-article.lead .v-article-body::first-letter {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 42px; font-weight: 900;
+            float: left; line-height: 0.8;
+            margin: 4px 6px 0 0; color: #8b1a1a;
+        }
+
+        /* Secondary article */
+        .v-article.secondary .v-article-headline {
+            font-size: 16px;
+        }
+
+        /* Tertiary article */
+        .v-article.tertiary .v-article-headline {
+            font-size: 14px; font-weight: 700;
+        }
+        .v-article.tertiary .v-article-body {
+            display: none;
+        }
+
+        /* --- In Brief Section --- */
+        .v-brief {
+            margin-top: 20px; padding-top: 12px;
+            border-top: 3px double #1a1410;
+        }
+        .v-brief-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+        }
+        .v-brief-col {
+            padding: 0 12px;
+            border-right: 1px solid #b8a88a;
+        }
+        .v-brief-col:first-child { padding-left: 0; }
+        .v-brief-col:last-child { border-right: none; padding-right: 0; }
+
+        .v-brief-item {
+            margin-bottom: 8px; padding-bottom: 8px;
+            border-bottom: 1px dotted #c8b898;
+        }
+        .v-brief-item:last-child { border-bottom: none; }
+        .v-brief-item .v-article-headline {
+            font-size: 13px; font-weight: 700;
+            line-height: 1.35;
+        }
+        .v-brief-item .v-article-headline a:hover { color: #8b1a1a; }
+
+        /* --- Classifieds Bar --- */
+        .v-classifieds {
+            margin-top: 20px; padding: 10px 16px;
+            border: 2px solid #1a1410;
+            background: rgba(26,20,16,0.03);
+            text-align: center;
+        }
+        .v-classifieds-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 6px; text-transform: uppercase;
+            color: #6a5e50; margin-bottom: 4px;
+        }
+        .v-classifieds-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 12px; font-style: italic;
+            color: #5a4e40;
+        }
+
+        /* --- Footer --- */
+        .v-footer {
+            text-align: center; padding-top: 14px; margin-top: 20px;
+            border-top: 4px double #1a1410;
+        }
+        .v-footer-ornament {
+            font-size: 16px; color: #8a7a66;
+            letter-spacing: 10px; margin-bottom: 6px;
+        }
+        .v-footer p {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 11px; font-style: italic;
+            color: #8a7a66; letter-spacing: 1px;
+        }
+
+        /* ================================================================
+           MODERN THEME — Clean Editorial Newspaper
+           ================================================================ */
+        body.modern {
+            background: #f0f0f2;
+            color: #1d1d1f;
+            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        body.modern .theme-switch {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        body.modern .theme-switch button {
+            background: transparent; color: #6e6e73;
+        }
+        body.modern .theme-switch button.active {
+            background: #1d1d1f; color: white;
+        }
+        body.modern .theme-switch button:hover:not(.active) {
+            background: rgba(0,0,0,0.04);
+        }
+        body.modern .vintage-page { display: none !important; }
+
+        .modern-page {
+            max-width: 1200px; margin: 0 auto;
+            padding: 20px 28px 48px;
+        }
+
+        /* --- Modern Header --- */
+        .m-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding-bottom: 14px;
+            border-bottom: 3px solid #1d1d1f;
+            margin-bottom: 24px;
+        }
+        .m-header h1 {
+            font-size: 32px; font-weight: 800;
+            letter-spacing: -0.5px; line-height: 1.1;
+        }
+        .m-header .m-tagline {
+            font-size: 13px; color: #86868b;
+            margin-top: 2px; font-weight: 400;
+        }
+        .m-header-right {
+            text-align: right; font-size: 13px; color: #6e6e73;
+        }
+        .m-header-right .m-date {
+            font-weight: 700; font-size: 15px; color: #1d1d1f;
+        }
+
+        /* --- Hero Article --- */
+        .m-hero {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            border: 1px solid #d2d2d7;
+            display: flex; gap: 24px; align-items: flex-start;
+        }
+        .m-hero-number {
+            font-size: 48px; font-weight: 800;
+            color: #d2d2d7; line-height: 1;
+            min-width: 50px;
+        }
+        .m-hero-content { flex: 1; }
+        .m-hero-badge {
+            display: inline-block;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+            color: white; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .m-hero-badge.entertainment { background: #ff2d55; }
+        .m-hero-badge.digital { background: #0071e3; }
+        .m-hero-badge.ai { background: #af52de; }
+        .m-hero-title {
+            font-size: 22px; font-weight: 700;
+            line-height: 1.35; margin-bottom: 8px;
+        }
+        .m-hero-title a { color: inherit; }
+        .m-hero-title a:hover { color: #0071e3; text-decoration: none; }
+        .m-hero-body {
+            font-size: 14px; color: #6e6e73;
+            line-height: 1.6;
+        }
+        .m-hero-heat {
+            font-size: 12px; color: #86868b;
+            margin-top: 6px; font-weight: 600;
+        }
+
+        /* --- Section --- */
+        .m-section { margin-bottom: 28px; }
+        .m-section-header {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #1d1d1f;
+        }
+        .m-section-header h2 {
+            font-size: 18px; font-weight: 800;
+        }
+        .m-section-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .m-section-dot.entertainment { background: #ff2d55; }
+        .m-section-dot.digital { background: #0071e3; }
+        .m-section-dot.ai { background: #af52de; }
+        .m-section-count {
+            margin-left: auto; font-size: 12px;
+            color: #86868b; font-weight: 600;
+        }
+
+        /* --- Article Grid --- */
+        .m-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .m-card {
+            background: white;
+            border: 1px solid #e5e5e7;
+            border-radius: 12px;
+            padding: 16px 18px;
+            transition: all 0.2s ease;
+            display: flex; gap: 12px; align-items: flex-start;
+        }
+        .m-card:hover {
+            border-color: #c0c0c5;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+        .m-card-num {
+            font-size: 18px; font-weight: 800;
+            color: #d2d2d7; min-width: 24px; line-height: 1.3;
+        }
+        .m-card-body { flex: 1; min-width: 0; }
+        .m-card-title {
+            font-size: 14px; font-weight: 600;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .m-card-title a { color: inherit; }
+        .m-card-title a:hover { color: #0071e3; text-decoration: none; }
+        .m-card-heat {
+            font-size: 11px; color: #86868b;
+            margin-top: 4px; font-weight: 600;
+        }
+
+        /* --- Modern Footer --- */
+        .m-footer {
+            text-align: center; padding-top: 20px;
+            border-top: 1px solid #d2d2d7;
+            margin-top: 16px;
+        }
+        .m-footer p {
+            font-size: 12px; color: #86868b;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 900px) {
+            .v-grid { grid-template-columns: 1fr 1fr; }
+            .v-col:nth-child(2) { border-right: none; }
+            .v-col:nth-child(3) { border-right: 1px solid #b8a88a; padding-left: 14px; }
+            .v-brief-grid { grid-template-columns: 1fr 1fr; }
+            .v-brief-col:nth-child(2) { border-right: none; }
+            .v-brief-col:nth-child(3) { border-right: 1px solid #b8a88a; padding-left: 12px; }
+            .m-grid { grid-template-columns: 1fr 1fr; }
+            .m-hero { flex-direction: column; }
+        }
+        @media (max-width: 600px) {
+            .vintage-page { padding: 12px 14px 32px; }
+            .v-grid { grid-template-columns: 1fr; }
+            .v-col { border-right: none !important; padding: 0 !important; }
+            .v-brief-grid { grid-template-columns: 1fr; }
+            .v-brief-col { border-right: none !important; padding: 0 !important; }
+            .v-topbar { flex-direction: column; gap: 4px; align-items: flex-start; }
+            .v-info-bar { flex-direction: column; gap: 4px; text-align: center; }
+            .modern-page { padding: 12px 14px 32px; }
+            .m-grid { grid-template-columns: 1fr; }
+            .m-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .m-header-right { text-align: left; }
+            .theme-switch { top: 8px; right: 8px; }
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .v-section-rule, .v-lead, .v-brief, .m-section, .m-hero {
+            animation: fadeUp 0.4s ease both;
+        }
+        .v-lead { animation-delay: 0.05s; }
+        .m-hero { animation-delay: 0.05s; }
+
+        /* ==================== PRINT ==================== */
+        @media print {
+            .theme-switch { display: none !important; }
+            body.vintage::before { display: none; }
+            body.vintage { background: white; }
+            body.modern .vintage-page { display: block !important; }
+            body.modern .modern-page { display: none !important; }
+        }
+    </style>
+</head>
+<body class="vintage">
+
+    <!-- Theme Switcher -->
+    <div class="theme-switch">
+        <button class="active" onclick="setTheme('vintage')">复古</button>
+        <button onclick="setTheme('modern')">现代</button>
+    </div>
+
+    <!-- ==================== VINTAGE LAYOUT ==================== -->
+    <div class="vintage-page">
+
+        <!-- Top Bar -->
+        <div class="v-topbar">
+            <div class="v-topbar-left">
+                <span class="v-weather">☀ 晴 26°C</span>
+                <span>FINAL EDITION</span>
+            </div>
+            <div class="v-topbar-right">
+                <span>LATE CITY</span>
+                <span>2026-09-16</span>
+            </div>
+        </div>
+
+        <!-- Masthead -->
+        <header class="v-masthead">
+            <h1 class="v-masthead-title">The Daily Scoop</h1>
+            <p class="v-masthead-tagline">热点日报 · All the Hot News That's Fit to Print</p>
+        </header>
+
+        <!-- Info Bar -->
+        <div class="v-info-bar">
+            <span>VOL. MMXXVI · NO. 259</span>
+            <span class="v-date-center">2026-09-16</span>
+            <span>PRICE: FREE · LATE EDITION</span>
+        </div>
+
+        <!-- Banner -->
+        <div class="v-banner">
+            <span class="v-banner-text">★ Extra Extra — All the Trending News ★</span>
+        </div>
+
+        <!-- Lead Headline -->
+        <div class="v-lead">
+    <div class="v-lead-kicker">★ Breaking Entertainment News ★</div>
+    <div class="v-lead-headline"><a href="https://s.weibo.com/weibo?q=%23%E7%AC%AC%E4%B8%80%E6%89%B9%E7%A9%BF%E5%BE%B7%E8%AE%AD%E9%9E%8B%E7%9A%84%E5%8F%97%E5%AE%B3%E8%80%85%E5%87%BA%E7%8E%B0%E4%BA%86%23" target="_blank">第一批穿德训鞋的受害者出现了</a></div>
+    <div class="v-lead-sub">第一批穿德训鞋的受害者出现了，引发全网热议 — 1486109</div>
+</div>
+
+        <!-- ENTERTAINMENT SECTION -->
+        <div class="v-section-rule">
+            <span class="v-section-title">娱乐热点</span>
+            <span class="v-section-subtitle">Entertainment &amp; Show Business</span>
+        </div>
+        <div class="v-grid">
+            <div class="v-col">
+<div class="v-article lead">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E7%AC%AC%E4%B8%80%E6%89%B9%E7%A9%BF%E5%BE%B7%E8%AE%AD%E9%9E%8B%E7%9A%84%E5%8F%97%E5%AE%B3%E8%80%85%E5%87%BA%E7%8E%B0%E4%BA%86%23" target="_blank">第一批穿德训鞋的受害者出现了</a></div>
+    <div class="v-article-body">第一批穿德训鞋的受害者出现了。热度高达1486109，引发全网广泛关注与热议。</div>
+    <div class="v-article-meta">1486109</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E7%88%B6%E4%BA%B2%E5%A4%96%E5%87%BA%E9%81%9B%E7%8B%97%E5%B9%BC%E7%AB%A5%E7%8B%AC%E7%95%99%E5%AE%B6%E4%B8%AD%E5%9D%A0%E4%BA%A1%23" target="_blank">父亲外出遛狗幼童独留家中坠亡</a></div>
+    <div class="v-article-body">父亲外出遛狗幼童独留家中坠亡，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">1122037</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E4%B8%80%E7%BB%84%E5%85%B3%E9%94%AE%E8%AF%8D%E7%9C%8B%E5%B9%B3%E9%99%86%E8%BF%90%E6%B2%B3%E7%A1%AC%E6%A0%B8%E5%AE%9E%E5%8A%9B%23" target="_blank">一组关键词看平陆运河硬核实力</a></div>
+    <div class="v-article-body">一组关键词看平陆运河硬核实力，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">700353</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E5%85%A8%E7%90%83%E9%A6%96%E6%AC%BEAI%E6%99%BA%E8%83%BD%E4%BD%93%E6%89%8B%E6%9C%BA%E4%BB%8A%E6%97%A5%E5%BC%80%E5%94%AE%23" target="_blank">全球首款AI智能体手机今日开售</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">661051</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E5%B0%8F%E4%BC%99%E8%AE%B0%E5%BD%95%E6%AF%8D%E4%BA%B2%E6%9C%80%E5%90%8E14%E5%A4%A9%E7%9A%84%E8%A7%86%E9%A2%91%E7%81%AB%E4%BA%86%23" target="_blank">小伙记录母亲最后14天的视频火了</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">638943</div>
+</div>
+</div>
+            <div class="v-col">
+<div class="v-article lead">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E5%AD%9F%E5%AD%90%E4%B9%89%E6%9F%AF%E6%B7%B3%E7%88%B1%E5%9C%A8%E6%97%A0%E5%B0%BD%E5%A4%8F%E6%8B%A5%E6%8A%B1%E8%B7%AF%E9%80%8F%23" target="_blank">孟子义柯淳爱在无尽夏拥抱路透</a></div>
+    <div class="v-article-body">孟子义柯淳爱在无尽夏拥抱路透。热度高达578453，引发全网广泛关注与热议。</div>
+    <div class="v-article-meta">578453</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E5%8D%97%E5%8C%BB%E5%A4%A7%E5%9D%A0%E4%BA%A1%E4%BA%8B%E4%BB%B6%E5%AF%BC%E5%B8%88%E5%AD%A6%E7%94%9F%E8%81%8A%E5%A4%A9%E8%AE%B0%E5%BD%95%23" target="_blank">南医大坠亡事件导师学生聊天记录</a></div>
+    <div class="v-article-body">南医大坠亡事件导师学生聊天记录，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">565986</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E6%80%A7%E6%A0%BC%E5%86%B3%E5%AE%9A%E5%91%BD%E8%BF%90%E8%BF%99%E5%8F%A5%E8%AF%9D%E5%A4%AA%E6%AE%8B%E5%BF%8D%E4%BA%86%23" target="_blank">性格决定命运这句话太残忍了</a></div>
+    <div class="v-article-body">性格决定命运这句话太残忍了，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">450556</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E5%85%B0%E9%A6%99%E5%A6%82%E6%95%85%E8%BF%99%E6%AE%B5%E5%AE%8C%E5%85%A8get%E5%88%B0%E5%AE%98%E9%85%8D%E4%BA%86%23" target="_blank">兰香如故这段完全get到官配了</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">386480</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E7%AA%81%E7%84%B6%E4%B8%80%E4%B8%8B%E5%B0%B1%E6%90%9E%E6%98%8E%E7%99%BD%E5%87%BD%E6%95%B0%E4%BA%86%23" target="_blank">突然一下就搞明白函数了</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">332483</div>
+</div>
+</div>
+            <div class="v-col">
+<div class="v-article lead">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003313.htm" target="_blank">微软 AI 负责人苏莱曼向 Anthropic 开炮：别让 Claude 去模仿人类意识</a></div>
+    <div class="v-article-body">微软 AI 负责人苏莱曼向 Anthropic 开炮：别让 Claude 去模仿人类意识。这一消息迅速传开，引发广泛关注与热议。</div>
+    
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003312.htm" target="_blank">华为发布《智能世界 2035》最新报告，预测到 2035 年全球年度 Token 消耗量将增长 10 万倍</a></div>
+    <div class="v-article-body">华为发布《智能世界 2035》最新报告，预测到 2035，详情请持续关注后续报道。</div>
+    
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003311.htm" target="_blank">诺和诺德与 Anthropic 达成合作，用 Claude 大模型加速新药研发</a></div>
+    <div class="v-article-body">诺和诺德与 Anthropic 达成合作，用 Claud，详情请持续关注后续报道。</div>
+    
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003310.htm" target="_blank">华擎推出三款全新 Taichi 系列电竞显示器：27 英寸 4K 240Hz、2K 500Hz、2K 540Hz/720P 720Hz</a></div>
+    <div class="v-article-body"></div>
+    
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003309.htm" target="_blank">蒙牛高钙多维牛奶 49.9 → 19.9 元闭眼囤：低至 1.99 元 / 盒、7.99 元 / L</a></div>
+    <div class="v-article-body"></div>
+    
+</div>
+</div>
+            <div class="v-col">
+<div class="v-article lead">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003308.htm" target="_blank">零跑推出 MM-i 多模混动电驱及 CTC 3.0 高低压融合电池，正式入局插混赛道</a></div>
+    <div class="v-article-body">零跑推出 MM-i 多模混动电驱及 CTC 3.0 高低压融合电池，正式入局插混赛道。这一消息迅速传开，引发广泛关注与热议。</div>
+    
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003307.htm" target="_blank">全新奥迪 A6L 官宣到店：搭载华为乾崑智驾技术，支持全国城区领航辅助功能</a></div>
+    <div class="v-article-body">全新奥迪 A6L 官宣到店：搭载华为乾崑智驾技术，支持全，详情请持续关注后续报道。</div>
+    
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003306.htm" target="_blank">因卡身序列号褪色，用户的 RTX 5090 公版显卡被英伟达拒保</a></div>
+    <div class="v-article-body">因卡身序列号褪色，用户的 RTX 5090 公版显卡被英，详情请持续关注后续报道。</div>
+    
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003305.htm" target="_blank">体验：当 vivo 蓝心小 V 升级 Pro 之后，OriginOS 7 开始变得不一样了</a></div>
+    <div class="v-article-body"></div>
+    
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003304.htm" target="_blank">鸿蒙智行智界 9 系旗舰 SUV 非量产测试车曝光，消息称原计划今年上市</a></div>
+    <div class="v-article-body"></div>
+    
+</div>
+</div>
+        </div>
+
+        <!-- AI SECTION -->
+        <div class="v-section-rule">
+            <span class="v-section-title">智能时代</span>
+            <span class="v-section-subtitle">Artificial Intelligence</span>
+        </div>
+        <div class="v-grid">
+            <div class="v-col">
+<div class="v-article lead">
+    <div class="v-article-headline"><a href="https://mathandai.org/" target="_blank">A misalignment of AI in mathematics</a></div>
+    <div class="v-article-body">A misalignment of AI in mathematics。热度高达1237 pts，引发全网广泛关注与热议。</div>
+    <div class="v-article-meta">1237 pts</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://news.ycombinator.com/item?id=49657850" target="_blank">Ask HN: Can we please limit the AI news flood?</a></div>
+    <div class="v-article-body">Ask HN: Can we please limit ，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">860 pts</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://xeiaso.net/notes/2026/everyone-slowdown-but-me/" target="_blank">Everyone should slow down AI development except for me</a></div>
+    <div class="v-article-body">Everyone should slow down AI，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">810 pts</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://yoshuabengio.org/en/publication/why-are-ai-agents-lying-cheating-and-coordinating" target="_blank">Why are AI agents lying, cheating and coordinating?</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">654 pts</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://www.economist.com/interactive/briefing/2026/09/03/nvidia-is-the-central-bank-of-ai" target="_blank">Nvidia is the central bank of AI</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">582 pts</div>
+</div>
+</div>
+            <div class="v-col">
+<div class="v-article lead">
+    <div class="v-article-headline"><a href="https://www.apple.com/newsroom/2026/09/apple-introduces-airpods-5-with-best-in-class-open-ear-active-noise-cancellation/" target="_blank">AirPods 5</a></div>
+    <div class="v-article-body">AirPods 5。热度高达508 pts，引发全网广泛关注与热议。</div>
+    <div class="v-article-meta">508 pts</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://techcrunch.com/2026/09/11/y-combinators-garry-tan-wants-u-s-open-weight-ai-labs-to-distill-frontier-models-too/" target="_blank">Garry Tan wants US open-weight AI labs to 'distill' frontier models, too</a></div>
+    <div class="v-article-body">Garry Tan wants US open-weig，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">412 pts</div>
+</div>
+<div class="v-article secondary">
+    <div class="v-article-headline"><a href="https://www.researchagenda.news/articles/the-waymo-effect.html" target="_blank">The Waymo effect: how AI is quietly making research less collaborative</a></div>
+    <div class="v-article-body">The Waymo effect: how AI is ，详情请持续关注后续报道。</div>
+    <div class="v-article-meta">335 pts</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://mistral.ai/news/mistral-x-mozilla/" target="_blank">Mistral X Mozilla: Private, Multilingual AI Browsing</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">285 pts</div>
+</div>
+<div class="v-article tertiary">
+    <div class="v-article-headline"><a href="https://withspecific.com/benchmarks/real-swe" target="_blank">Real-SWE: Benchmarking AI models on private, real-world, enterprise codebases</a></div>
+    <div class="v-article-body"></div>
+    <div class="v-article-meta">275 pts</div>
+</div>
+</div>
+            <div class="v-col">
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E7%AC%AC%E4%B8%80%E6%89%B9%E7%A9%BF%E5%BE%B7%E8%AE%AD%E9%9E%8B%E7%9A%84%E5%8F%97%E5%AE%B3%E8%80%85%E5%87%BA%E7%8E%B0%E4%BA%86%23" target="_blank">第一批穿德训鞋的受害者出现了</a> <span style="color:#8a7a66">· 1486109</span></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003313.htm" target="_blank">微软 AI 负责人苏莱曼向 Anthropic 开炮：别让 Claude 去模仿人类意识</a></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://mathandai.org/" target="_blank">A misalignment of AI in mathematics</a> <span style="color:#8a7a66">· 1237 pts</span></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E7%88%B6%E4%BA%B2%E5%A4%96%E5%87%BA%E9%81%9B%E7%8B%97%E5%B9%BC%E7%AB%A5%E7%8B%AC%E7%95%99%E5%AE%B6%E4%B8%AD%E5%9D%A0%E4%BA%A1%23" target="_blank">父亲外出遛狗幼童独留家中坠亡</a> <span style="color:#8a7a66">· 1122037</span></div>
+</div>
+</div>
+            <div class="v-col">
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003312.htm" target="_blank">华为发布《智能世界 2035》最新报告，预测到 2035 年全球年度 Token 消耗量将增长 10 万倍</a></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://news.ycombinator.com/item?id=49657850" target="_blank">Ask HN: Can we please limit the AI news flood?</a> <span style="color:#8a7a66">· 860 pts</span></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://s.weibo.com/weibo?q=%23%E4%B8%80%E7%BB%84%E5%85%B3%E9%94%AE%E8%AF%8D%E7%9C%8B%E5%B9%B3%E9%99%86%E8%BF%90%E6%B2%B3%E7%A1%AC%E6%A0%B8%E5%AE%9E%E5%8A%9B%23" target="_blank">一组关键词看平陆运河硬核实力</a> <span style="color:#8a7a66">· 700353</span></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://www.ithome.com/0/1003311.htm" target="_blank">诺和诺德与 Anthropic 达成合作，用 Claude 大模型加速新药研发</a></div>
+</div>
+<div class="v-brief-item">
+    <div class="v-article-headline"><a href="https://xeiaso.net/notes/2026/everyone-slowdown-but-me/" target="_blank">Everyone should slow down AI development except for me</a> <span style="color:#8a7a66">· 810 pts</span></div>
+</div>
+</div>
+        </div>
+
+        <!-- Classifieds -->
+        <div class="v-classifieds">
+            <div class="v-classifieds-title">— Classifieds —</div>
+            <div class="v-classifieds-text">今日热点由 Python 自动抓取 · 数据来源于公开 API · 生成时间 23:09:13</div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="v-footer">
+            <div class="v-footer-ornament">—  —</div>
+            <p>THE DAILY SCOOP · 热点日报 · Est. 2026</p>
+        </footer>
+    </div>
+
+    <!-- ==================== MODERN LAYOUT ==================== -->
+    <div class="modern-page">
+
+        <header class="m-header">
+            <div>
+                <h1>热点日报</h1>
+                <p class="m-tagline">每日热点 · 一文尽览</p>
+            </div>
+            <div class="m-header-right">
+                <div class="m-date">2026-09-16</div>
+                <div>23:09:13</div>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <div class="m-hero">
+    <div class="m-hero-number">1</div>
+    <div class="m-hero-content">
+        <span class="m-hero-badge entertainment">TOP</span>
+        <div class="m-hero-title"><a href="https://s.weibo.com/weibo?q=%23%E7%AC%AC%E4%B8%80%E6%89%B9%E7%A9%BF%E5%BE%B7%E8%AE%AD%E9%9E%8B%E7%9A%84%E5%8F%97%E5%AE%B3%E8%80%85%E5%87%BA%E7%8E%B0%E4%BA%86%23" target="_blank">第一批穿德训鞋的受害者出现了</a></div>
+        <div class="m-hero-body">第一批穿德训鞋的受害者出现了——这是今日最受关注的话题，引发全网热烈讨论。</div>
+        <div class="m-hero-heat">1486109</div>
+    </div>
+</div>
+
+        <!-- Entertainment -->
+        <section class="m-section">
+            <div class="m-section-header">
+                <div class="m-section-dot entertainment"></div>
+                <h2>娱乐</h2>
+                <span class="m-section-count">TOP 10</span>
+            </div>
+            <div class="m-grid">
+                <div class="m-card">
+    <div class="m-card-num">1</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E7%AC%AC%E4%B8%80%E6%89%B9%E7%A9%BF%E5%BE%B7%E8%AE%AD%E9%9E%8B%E7%9A%84%E5%8F%97%E5%AE%B3%E8%80%85%E5%87%BA%E7%8E%B0%E4%BA%86%23" target="_blank">第一批穿德训鞋的受害者出现了</a></div>
+        <div class="m-card-heat">1486109</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">2</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E7%88%B6%E4%BA%B2%E5%A4%96%E5%87%BA%E9%81%9B%E7%8B%97%E5%B9%BC%E7%AB%A5%E7%8B%AC%E7%95%99%E5%AE%B6%E4%B8%AD%E5%9D%A0%E4%BA%A1%23" target="_blank">父亲外出遛狗幼童独留家中坠亡</a></div>
+        <div class="m-card-heat">1122037</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">3</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E4%B8%80%E7%BB%84%E5%85%B3%E9%94%AE%E8%AF%8D%E7%9C%8B%E5%B9%B3%E9%99%86%E8%BF%90%E6%B2%B3%E7%A1%AC%E6%A0%B8%E5%AE%9E%E5%8A%9B%23" target="_blank">一组关键词看平陆运河硬核实力</a></div>
+        <div class="m-card-heat">700353</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">4</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E5%85%A8%E7%90%83%E9%A6%96%E6%AC%BEAI%E6%99%BA%E8%83%BD%E4%BD%93%E6%89%8B%E6%9C%BA%E4%BB%8A%E6%97%A5%E5%BC%80%E5%94%AE%23" target="_blank">全球首款AI智能体手机今日开售</a></div>
+        <div class="m-card-heat">661051</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">5</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E5%B0%8F%E4%BC%99%E8%AE%B0%E5%BD%95%E6%AF%8D%E4%BA%B2%E6%9C%80%E5%90%8E14%E5%A4%A9%E7%9A%84%E8%A7%86%E9%A2%91%E7%81%AB%E4%BA%86%23" target="_blank">小伙记录母亲最后14天的视频火了</a></div>
+        <div class="m-card-heat">638943</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">6</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E5%AD%9F%E5%AD%90%E4%B9%89%E6%9F%AF%E6%B7%B3%E7%88%B1%E5%9C%A8%E6%97%A0%E5%B0%BD%E5%A4%8F%E6%8B%A5%E6%8A%B1%E8%B7%AF%E9%80%8F%23" target="_blank">孟子义柯淳爱在无尽夏拥抱路透</a></div>
+        <div class="m-card-heat">578453</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">7</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E5%8D%97%E5%8C%BB%E5%A4%A7%E5%9D%A0%E4%BA%A1%E4%BA%8B%E4%BB%B6%E5%AF%BC%E5%B8%88%E5%AD%A6%E7%94%9F%E8%81%8A%E5%A4%A9%E8%AE%B0%E5%BD%95%23" target="_blank">南医大坠亡事件导师学生聊天记录</a></div>
+        <div class="m-card-heat">565986</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">8</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E6%80%A7%E6%A0%BC%E5%86%B3%E5%AE%9A%E5%91%BD%E8%BF%90%E8%BF%99%E5%8F%A5%E8%AF%9D%E5%A4%AA%E6%AE%8B%E5%BF%8D%E4%BA%86%23" target="_blank">性格决定命运这句话太残忍了</a></div>
+        <div class="m-card-heat">450556</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">9</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E5%85%B0%E9%A6%99%E5%A6%82%E6%95%85%E8%BF%99%E6%AE%B5%E5%AE%8C%E5%85%A8get%E5%88%B0%E5%AE%98%E9%85%8D%E4%BA%86%23" target="_blank">兰香如故这段完全get到官配了</a></div>
+        <div class="m-card-heat">386480</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">10</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://s.weibo.com/weibo?q=%23%E7%AA%81%E7%84%B6%E4%B8%80%E4%B8%8B%E5%B0%B1%E6%90%9E%E6%98%8E%E7%99%BD%E5%87%BD%E6%95%B0%E4%BA%86%23" target="_blank">突然一下就搞明白函数了</a></div>
+        <div class="m-card-heat">332483</div>
+    </div>
+</div>
+            </div>
+        </section>
+
+        <!-- Digital -->
+        <section class="m-section">
+            <div class="m-section-header">
+                <div class="m-section-dot digital"></div>
+                <h2>数码</h2>
+                <span class="m-section-count">TOP 10</span>
+            </div>
+            <div class="m-grid">
+                <div class="m-card">
+    <div class="m-card-num">1</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003313.htm" target="_blank">微软 AI 负责人苏莱曼向 Anthropic 开炮：别让 Claude 去模仿人类意识</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">2</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003312.htm" target="_blank">华为发布《智能世界 2035》最新报告，预测到 2035 年全球年度 Token 消耗量将增长 10 万倍</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">3</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003311.htm" target="_blank">诺和诺德与 Anthropic 达成合作，用 Claude 大模型加速新药研发</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">4</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003310.htm" target="_blank">华擎推出三款全新 Taichi 系列电竞显示器：27 英寸 4K 240Hz、2K 500Hz、2K 540Hz/720P 720Hz</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">5</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003309.htm" target="_blank">蒙牛高钙多维牛奶 49.9 → 19.9 元闭眼囤：低至 1.99 元 / 盒、7.99 元 / L</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">6</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003308.htm" target="_blank">零跑推出 MM-i 多模混动电驱及 CTC 3.0 高低压融合电池，正式入局插混赛道</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">7</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003307.htm" target="_blank">全新奥迪 A6L 官宣到店：搭载华为乾崑智驾技术，支持全国城区领航辅助功能</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">8</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003306.htm" target="_blank">因卡身序列号褪色，用户的 RTX 5090 公版显卡被英伟达拒保</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">9</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003305.htm" target="_blank">体验：当 vivo 蓝心小 V 升级 Pro 之后，OriginOS 7 开始变得不一样了</a></div>
+        
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">10</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.ithome.com/0/1003304.htm" target="_blank">鸿蒙智行智界 9 系旗舰 SUV 非量产测试车曝光，消息称原计划今年上市</a></div>
+        
+    </div>
+</div>
+            </div>
+        </section>
+
+        <!-- AI -->
+        <section class="m-section">
+            <div class="m-section-header">
+                <div class="m-section-dot ai"></div>
+                <h2>AI</h2>
+                <span class="m-section-count">TOP 10</span>
+            </div>
+            <div class="m-grid">
+                <div class="m-card">
+    <div class="m-card-num">1</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://mathandai.org/" target="_blank">A misalignment of AI in mathematics</a></div>
+        <div class="m-card-heat">1237 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">2</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://news.ycombinator.com/item?id=49657850" target="_blank">Ask HN: Can we please limit the AI news flood?</a></div>
+        <div class="m-card-heat">860 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">3</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://xeiaso.net/notes/2026/everyone-slowdown-but-me/" target="_blank">Everyone should slow down AI development except for me</a></div>
+        <div class="m-card-heat">810 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">4</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://yoshuabengio.org/en/publication/why-are-ai-agents-lying-cheating-and-coordinating" target="_blank">Why are AI agents lying, cheating and coordinating?</a></div>
+        <div class="m-card-heat">654 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">5</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.economist.com/interactive/briefing/2026/09/03/nvidia-is-the-central-bank-of-ai" target="_blank">Nvidia is the central bank of AI</a></div>
+        <div class="m-card-heat">582 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">6</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.apple.com/newsroom/2026/09/apple-introduces-airpods-5-with-best-in-class-open-ear-active-noise-cancellation/" target="_blank">AirPods 5</a></div>
+        <div class="m-card-heat">508 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">7</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://techcrunch.com/2026/09/11/y-combinators-garry-tan-wants-u-s-open-weight-ai-labs-to-distill-frontier-models-too/" target="_blank">Garry Tan wants US open-weight AI labs to 'distill' frontier models, too</a></div>
+        <div class="m-card-heat">412 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">8</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://www.researchagenda.news/articles/the-waymo-effect.html" target="_blank">The Waymo effect: how AI is quietly making research less collaborative</a></div>
+        <div class="m-card-heat">335 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">9</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://mistral.ai/news/mistral-x-mozilla/" target="_blank">Mistral X Mozilla: Private, Multilingual AI Browsing</a></div>
+        <div class="m-card-heat">285 pts</div>
+    </div>
+</div>
+<div class="m-card">
+    <div class="m-card-num">10</div>
+    <div class="m-card-body">
+        <div class="m-card-title"><a href="https://withspecific.com/benchmarks/real-swe" target="_blank">Real-SWE: Benchmarking AI models on private, real-world, enterprise codebases</a></div>
+        <div class="m-card-heat">275 pts</div>
+    </div>
+</div>
+            </div>
+        </section>
+
+        <footer class="m-footer">
+            <p>Generated at 23:09:13 · Data from public sources</p>
+        </footer>
+    </div>
+
+    <script>
+        function setTheme(t) {
+            document.body.className = t;
+            document.querySelectorAll('.theme-switch button').forEach(b => {
+                b.classList.toggle('active', b.textContent.includes(t === 'vintage' ? '复古' : '现代'));
+            });
+            localStorage.setItem('newspaper-theme', t);
+        }
+        (function() {
+            var s = localStorage.getItem('newspaper-theme');
+            if (s) setTheme(s);
+        })();
+    </script>
+</body>
+</html>
