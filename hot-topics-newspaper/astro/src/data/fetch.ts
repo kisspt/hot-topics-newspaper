@@ -1,6 +1,5 @@
 import type { TopicsData } from './demo';
 import DEMO_DATA from './demo';
-import { extractSummaries } from './extract';
 
 const HEADERS = {
   'User-Agent':
@@ -20,35 +19,36 @@ async function fetchJSON(url: string, init?: RequestInit, timeout = 10_000) {
   }
 }
 
-/* ── 翻译：英文 → 中文（MyMemory 免费 API） ── */
-async function translateToChinese(text: string): Promise<string> {
+async function fetchHTML(url: string, timeout = 10_000): Promise<string | null> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeout);
   try {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|zh-CN`;
-    const data = await fetchJSON(url, undefined, 5_000);
-    const translated = data?.responseData?.translatedText;
-    if (translated && translated !== text) return translated;
-  } catch { /* fallback */ }
-  return text;
+    const resp = await fetch(url, { headers: HEADERS, signal: ctrl.signal, redirect: 'follow' });
+    if (!resp.ok) return null;
+    return await resp.text();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
+/* ── 娱乐板块：抖音热榜 ── */
 async function fetchEntertainment() {
   try {
-    const data = await fetchJSON('https://weibo.com/ajax/side/hotSearch', {
-      headers: { ...HEADERS, Referer: 'https://weibo.com/' },
-    });
+    const data = await fetchJSON(
+      'https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/',
+    );
     const items: TopicsData['entertainment'] = [];
     let rank = 1;
-    for (const item of data?.data?.realtime ?? []) {
-      // 跳过广告
-      if (item.is_ad) continue;
+    for (const item of data?.word_list ?? []) {
       const word = item.word ?? '';
       if (!word) continue;
       items.push({
         rank,
         title: word,
-        url: `https://s.weibo.com/weibo?q=%23${encodeURIComponent(word)}%23`,
-        hot: String(item.num ?? ''),
-        // 微博热搜关键词本身就是描述性句子，直接作为摘要
+        url: `https://www.douyin.com/search/${encodeURIComponent(word)}`,
+        hot: item.hot_value ? `${Math.round(item.hot_value / 10000)}万` : '',
         summary: word,
       });
       if (++rank > 10) break;
@@ -58,29 +58,29 @@ async function fetchEntertainment() {
   return DEMO_DATA.entertainment;
 }
 
+/* ── 数码板块：IT之家数码热榜（HTML 解析） ── */
 async function fetchDigital() {
   try {
-    // 使用 hot 分类获取热榜新闻（而非最新新闻）
-    const data = await fetchJSON(
-      'https://m.ithome.com/api/news/newslistpageget?catename=hot&pagesize=20',
-      { headers: HEADERS },
-    );
+    const html = await fetchHTML('https://www.ithome.com/block/rank.html?d=digi');
+    if (!html) return DEMO_DATA.digital;
+
+    // 数码热榜在 id="d-4" 的 tab 中
+    const tabMatch = html.match(/id="d-4"[^>]*>([\s\S]*?)<\/ul>/);
+    if (!tabMatch) return DEMO_DATA.digital;
+
     const items: TopicsData['digital'] = [];
+    const linkRegex = /title="([^"]+)"[^>]*href="([^"]+)"/g;
+    let match;
     let rank = 1;
-    for (const item of data?.Result ?? []) {
-      const title = item.title ?? '';
+    while ((match = linkRegex.exec(tabMatch[1])) !== null) {
+      const [, title, rawUrl] = match;
       if (!title) continue;
-      // 跳过广告
-      if (item.NewsTips?.some((t: any) => t.TipName === '广告')) continue;
-      const desc = item.description ?? '';
-      const itemUrl = item.url ?? '';
-      const fullUrl = itemUrl.startsWith('http') ? itemUrl : `https://www.ithome.com${itemUrl}`;
+      const fullUrl = rawUrl.startsWith('http') ? rawUrl : `https://www.ithome.com${rawUrl}`;
       items.push({
         rank,
         title,
         url: fullUrl,
         hot: '',
-        summary: desc || undefined,
       });
       if (++rank > 10) break;
     }
@@ -89,36 +89,41 @@ async function fetchDigital() {
   return DEMO_DATA.digital;
 }
 
+/* ── AI板块：量子位（QbitAI） ── */
 async function fetchAI() {
   try {
-    const since = Math.floor(Date.now() / 1000) - 604800;
     const data = await fetchJSON(
-      `https://hn.algolia.com/api/v1/search?query=AI&tags=story&hitsPerPage=20&numericFilters=created_at_i>${since}`,
+      'https://www.qbitai.com/wp-json/wp/v2/posts?per_page=10&_embed',
       { headers: HEADERS },
     );
-    const raw: { title: string; url: string; hot: string }[] = [];
-    let rank = 1;
-    for (const hit of data?.hits ?? []) {
-      const title = hit.title ?? '';
-      if (!title) continue;
-      raw.push({
-        title,
-        url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
-        hot: hit.points ? `${hit.points} pts` : '',
-      });
-      if (++rank > 11) break;
-    }
-    if (raw.length < 3) return DEMO_DATA.ai;
+    if (!Array.isArray(data)) return DEMO_DATA.ai;
 
-    // 顺序翻译标题，避免触发限流（MyMemory 免费额度 ~1000 词/天）
     const items: TopicsData['ai'] = [];
-    for (let i = 0; i < Math.min(raw.length, 10); i++) {
-      const r = raw[i];
-      const zhTitle = await translateToChinese(r.title);
-      items.push({ rank: i + 1, title: zhTitle, url: r.url, hot: r.hot });
-      if (i < raw.length - 1) await new Promise((r) => setTimeout(r, 300));
+    let rank = 1;
+    for (const post of data) {
+      const title = post?.title?.rendered ?? '';
+      if (!title) continue;
+      const link = post?.link ?? '';
+      // 从 excerpt HTML 中提取纯文本摘要
+      const excerptHtml = post?.excerpt?.rendered ?? '';
+      const summary = excerptHtml
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/\s+/g, ' ')
+        .trim();
+      items.push({
+        rank,
+        title,
+        url: link,
+        hot: '',
+        summary: summary ? (summary.length > 140 ? summary.slice(0, 137) + '...' : summary) : undefined,
+      });
+      if (++rank > 10) break;
     }
-    return items;
+    if (items.length >= 3) return items.slice(0, 10);
   } catch { /* fallback */ }
   return DEMO_DATA.ai;
 }
@@ -129,10 +134,5 @@ export async function fetchTopics(): Promise<TopicsData> {
     fetchDigital(),
     fetchAI(),
   ]);
-
-  // 只为数码板块提取页面摘要（IT之家 API 已自带 description，跳过重复提取）
-  // 微博已在 fetchEntertainment 中设置 summary，AI 已翻译
-  // 不再需要 extractSummaries
-
   return { entertainment, digital, ai };
 }
