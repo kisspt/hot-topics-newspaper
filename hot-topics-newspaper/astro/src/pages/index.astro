@@ -8,6 +8,7 @@ import SectionPage from '../components/SectionPage.astro';
 import BriefPage from '../components/BriefPage.astro';
 import ModernPage from '../components/ModernPage.astro';
 import { fetchTopics } from '../data/fetch';
+import { pickIcon } from '../data/pickIcon';
 import DEMO_DATA from '../data/demo';
 
 // Fetch data at build time (falls back to DEMO_DATA on failure)
@@ -96,7 +97,7 @@ const ai = data.ai;
           </div>
           <div class="v-pagebody">
             <div class="v-fit">
-              <SectionPage items={ent} icon="ic-masks" kicker="娱乐热点 · Entertainment & Show Business" dekSeed={1} />
+              <SectionPage items={ent} icon={pickIcon(ent, 'ic-masks')} kicker="娱乐热点 · Entertainment & Show Business" dekSeed={1} />
             </div>
           </div>
           <div class="v-footer"><div class="v-footer-ornament">— ✦ —</div><p>ENTERTAINMENT · 娱乐热点</p></div>
@@ -113,7 +114,7 @@ const ai = data.ai;
           </div>
           <div class="v-pagebody">
             <div class="v-fit">
-              <SectionPage items={dig} icon="ic-gear" kicker="数码前沿 · Digital & Tech" dekSeed={4} />
+              <SectionPage items={dig} icon={pickIcon(dig, 'ic-gear')} kicker="数码前沿 · Digital & Tech" dekSeed={4} />
             </div>
           </div>
           <div class="v-footer"><div class="v-footer-ornament">— ✦ —</div><p>DIGITAL · 数码前沿</p></div>
@@ -130,7 +131,7 @@ const ai = data.ai;
           </div>
           <div class="v-pagebody">
             <div class="v-fit">
-              <SectionPage items={ai} icon="ic-brain" kicker="智能时代 · Artificial Intelligence" dekSeed={7} />
+              <SectionPage items={ai} icon={pickIcon(ai, 'ic-brain')} kicker="智能时代 · Artificial Intelligence" dekSeed={7} />
             </div>
           </div>
           <div class="v-footer"><div class="v-footer-ornament">— ✦ —</div><p>INTELLIGENCE · 智能时代</p></div>

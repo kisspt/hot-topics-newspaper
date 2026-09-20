@@ -329,7 +329,9 @@ body.modern ::-webkit-scrollbar-corner { background: transparent; }
     background: transparent; color: #e8dcc0; cursor: pointer; font-size: 18px; line-height: 1;
     display: grid; place-items: center; transition: all .2s ease;
 }
-.v-pager button.nav:hover:not(:disabled) { background: #8b1a1a; border-color: #8b1a1a; color: #fff; }
+@media (hover: hover) {
+  .v-pager button.nav:hover:not(:disabled) { background: #8b1a1a; border-color: #8b1a1a; color: #fff; }
+}
 .v-pager button.nav:disabled { opacity: .3; cursor: not-allowed; }
 .v-pager-label { min-width: 150px; text-align: center; }
 .v-pager-name { display: block; font-size: 14px; font-weight: 700; letter-spacing: 1px; }
