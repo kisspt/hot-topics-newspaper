@@ -33,23 +33,26 @@ async function fetchHTML(url: string, timeout = 10_000): Promise<string | null> 
   }
 }
 
-/* ── 娱乐板块：抖音热榜 ── */
+/* ── 娱乐板块：百度热搜（带摘要） ── */
 async function fetchEntertainment() {
   try {
     const data = await fetchJSON(
-      'https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/',
+      'https://top.baidu.com/api/board?platform=pc&tab=realtime',
+      { headers: HEADERS },
     );
     const items: TopicsData['entertainment'] = [];
     let rank = 1;
-    for (const item of data?.word_list ?? []) {
+    for (const item of data?.data?.cards?.[0]?.content ?? []) {
       const word = item.word ?? '';
       if (!word) continue;
+      const desc = item.desc ?? '';
+      const url = item.rawUrl || item.url || `https://www.baidu.com/s?wd=${encodeURIComponent(word)}`;
       items.push({
         rank,
         title: word,
-        url: `https://www.douyin.com/search/${encodeURIComponent(word)}`,
-        hot: item.hot_value ? `${Math.round(item.hot_value / 10000)}万` : '',
-        summary: word,
+        url,
+        hot: item.hotScore ? `${Math.round(item.hotScore / 10000)}万` : '',
+        summary: desc || word,
       });
       if (++rank > 10) break;
     }
