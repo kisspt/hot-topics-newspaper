@@ -77,6 +77,7 @@ if (stage) {
     oldEl.classList.add('v-leaf', dir > 0 ? 'turn-out-next' : 'turn-out-prev');
     newEl.classList.add('active', dir > 0 ? 'turn-in-next' : 'turn-in-prev');
     cur = n;
+    stage.scrollTop = 0;
     sync();
 
     function done() {
