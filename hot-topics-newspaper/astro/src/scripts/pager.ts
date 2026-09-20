@@ -52,13 +52,18 @@ if (stage) {
     sheet.style.alignItems = fits ? 'center' : 'flex-start';
   }
 
+  function tapFeedback(btn: HTMLButtonElement) {
+    btn.classList.add('tapped');
+    setTimeout(() => btn.classList.remove('tapped'), 200);
+  }
+
   function sync() {
     nameEl.textContent = sheets[cur].dataset.name || '';
     countEl.textContent = `第 ${cur + 1} 版 / 共 ${sheets.length} 版`;
     prevBtn.disabled = cur === 0;
     nextBtn.disabled = cur === sheets.length - 1;
     dots.forEach((d, i) => d.classList.toggle('active', i === cur));
-    fitSheet(sheets[cur]);
+    if (!busy) fitSheet(sheets[cur]);
   }
 
   function go(n: number) {
@@ -95,8 +100,8 @@ if (stage) {
     }, 700);
   }
 
-  prevBtn.addEventListener('click', () => { go(cur - 1); prevBtn.blur(); });
-  nextBtn.addEventListener('click', () => { go(cur + 1); nextBtn.blur(); });
+  prevBtn.addEventListener('click', () => { tapFeedback(prevBtn); go(cur - 1); prevBtn.blur(); });
+  nextBtn.addEventListener('click', () => { tapFeedback(nextBtn); go(cur + 1); nextBtn.blur(); });
 
   document.addEventListener('keydown', (e) => {
     if (document.body.className !== 'vintage') return;

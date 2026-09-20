@@ -85,11 +85,19 @@ body.vintage .modern-page { display: none !important; }
 @keyframes flipInNext  { from { opacity:0; transform: rotateY(60deg); } to { opacity:1; transform: rotateY(0); } }
 @keyframes flipOutPrev { from { opacity:1; transform: rotateY(0); } to { opacity:0; transform: rotateY(78deg); } }
 @keyframes flipInPrev  { from { opacity:0; transform: rotateY(-60deg); } to { opacity:1; transform: rotateY(0); } }
-.v-leaf { transform-origin: left center; backface-visibility: hidden; }
+.v-leaf { transform-origin: left center; backface-visibility: hidden; will-change: transform; }
 .v-leaf.turn-out-next { animation: flipOutNext .55s cubic-bezier(.4,.05,.55,.95) forwards; }
 .v-sheet.turn-in-next { transform-origin: right center; animation: flipInNext .55s cubic-bezier(.4,.05,.55,.95); }
 .v-leaf.turn-out-prev { transform-origin: right center; animation: flipOutPrev .55s cubic-bezier(.4,.05,.55,.95) forwards; }
 .v-sheet.turn-in-prev { transform-origin: left center; animation: flipInPrev .55s cubic-bezier(.4,.05,.55,.95); }
+@media (max-width: 640px) {
+  .v-leaf.turn-out-next { animation: fadeOut .3s ease forwards; }
+  .v-sheet.turn-in-next { animation: fadeIn .3s ease; }
+  .v-leaf.turn-out-prev { animation: fadeOut .3s ease forwards; }
+  .v-sheet.turn-in-prev { animation: fadeIn .3s ease; }
+}
+@keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
 /* --- Masthead (front page) --- */
 .v-topbar {
@@ -324,6 +332,9 @@ body.modern ::-webkit-scrollbar-corner { background: transparent; }
     box-shadow: 0 6px 22px rgba(0,0,0,0.3);
     font-family: 'Playfair Display', Georgia, serif; color: #e8dcc0;
 }
+@media (max-width: 640px) {
+  .v-pager { backdrop-filter: none; -webkit-backdrop-filter: none; background: #1a1410; }
+}
 .v-pager button.nav {
     width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(184,168,138,0.4);
     background: transparent; color: #e8dcc0; cursor: pointer; font-size: 18px; line-height: 1;
@@ -332,7 +343,7 @@ body.modern ::-webkit-scrollbar-corner { background: transparent; }
     outline: none;
 }
 .v-pager button.nav:focus { outline: none; box-shadow: none; }
-.v-pager button.nav:active:not(:disabled) { background: rgba(139,26,26,0.3); }
+.v-pager button.nav.tapped { background: #8b1a1a; border-color: #8b1a1a; color: #fff; transition: none; }
 @media (hover: hover) {
   .v-pager button.nav:hover:not(:disabled) { background: #8b1a1a; border-color: #8b1a1a; color: #fff; }
 }
