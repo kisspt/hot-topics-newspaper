@@ -20,6 +20,17 @@ async function fetchJSON(url: string, init?: RequestInit, timeout = 10_000) {
   }
 }
 
+/* ── 翻译：英文 → 中文（MyMemory 免费 API） ── */
+async function translateToChinese(text: string): Promise<string> {
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|zh-CN`;
+    const data = await fetchJSON(url, undefined, 5_000);
+    const translated = data?.responseData?.translatedText;
+    if (translated && translated !== text) return translated;
+  } catch { /* fallback */ }
+  return text;
+}
+
 async function fetchEntertainment() {
   try {
     const data = await fetchJSON('https://weibo.com/ajax/side/hotSearch', {
@@ -28,6 +39,8 @@ async function fetchEntertainment() {
     const items: TopicsData['entertainment'] = [];
     let rank = 1;
     for (const item of data?.data?.realtime ?? []) {
+      // 跳过广告
+      if (item.is_ad) continue;
       const word = item.word ?? '';
       if (!word) continue;
       items.push({
@@ -35,6 +48,8 @@ async function fetchEntertainment() {
         title: word,
         url: `https://s.weibo.com/weibo?q=%23${encodeURIComponent(word)}%23`,
         hot: String(item.num ?? ''),
+        // 微博热搜关键词本身就是描述性句子，直接作为摘要
+        summary: word,
       });
       if (++rank > 10) break;
     }
@@ -45,8 +60,9 @@ async function fetchEntertainment() {
 
 async function fetchDigital() {
   try {
+    // 使用 hot 分类获取热榜新闻（而非最新新闻）
     const data = await fetchJSON(
-      'https://m.ithome.com/api/news/newslistpageget?catename=%E6%95%B0%E7%A0%81&pagesize=15',
+      'https://m.ithome.com/api/news/newslistpageget?catename=hot&pagesize=20',
       { headers: HEADERS },
     );
     const items: TopicsData['digital'] = [];
@@ -54,7 +70,8 @@ async function fetchDigital() {
     for (const item of data?.Result ?? []) {
       const title = item.title ?? '';
       if (!title) continue;
-      // Use the description from API directly as summary
+      // 跳过广告
+      if (item.NewsTips?.some((t: any) => t.TipName === '广告')) continue;
       const desc = item.description ?? '';
       const itemUrl = item.url ?? '';
       const fullUrl = itemUrl.startsWith('http') ? itemUrl : `https://www.ithome.com${itemUrl}`;
@@ -79,20 +96,29 @@ async function fetchAI() {
       `https://hn.algolia.com/api/v1/search?query=AI&tags=story&hitsPerPage=20&numericFilters=created_at_i>${since}`,
       { headers: HEADERS },
     );
-    const items: TopicsData['ai'] = [];
+    const raw: { title: string; url: string; hot: string }[] = [];
     let rank = 1;
     for (const hit of data?.hits ?? []) {
       const title = hit.title ?? '';
       if (!title) continue;
-      items.push({
-        rank,
+      raw.push({
         title,
         url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
         hot: hit.points ? `${hit.points} pts` : '',
       });
-      if (++rank > 10) break;
+      if (++rank > 11) break;
     }
-    if (items.length >= 3) return items.slice(0, 10);
+    if (raw.length < 3) return DEMO_DATA.ai;
+
+    // 顺序翻译标题，避免触发限流（MyMemory 免费额度 ~1000 词/天）
+    const items: TopicsData['ai'] = [];
+    for (let i = 0; i < Math.min(raw.length, 10); i++) {
+      const r = raw[i];
+      const zhTitle = await translateToChinese(r.title);
+      items.push({ rank: i + 1, title: zhTitle, url: r.url, hot: r.hot });
+      if (i < raw.length - 1) await new Promise((r) => setTimeout(r, 300));
+    }
+    return items;
   } catch { /* fallback */ }
   return DEMO_DATA.ai;
 }
@@ -104,15 +130,9 @@ export async function fetchTopics(): Promise<TopicsData> {
     fetchAI(),
   ]);
 
-  // Extract real summaries from article pages (batched, concurrent)
-  const allItems = [...entertainment, ...digital, ...ai];
-  const summaries = await extractSummaries(allItems);
-  let idx = 0;
-  for (const arr of [entertainment, digital, ai]) {
-    for (const item of arr) {
-      item.summary = summaries[idx++];
-    }
-  }
+  // 只为数码板块提取页面摘要（IT之家 API 已自带 description，跳过重复提取）
+  // 微博已在 fetchEntertainment 中设置 summary，AI 已翻译
+  // 不再需要 extractSummaries
 
   return { entertainment, digital, ai };
 }
