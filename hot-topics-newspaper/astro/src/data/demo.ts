@@ -4,6 +4,7 @@ export interface TopicItem {
   title: string;
   url: string;
   hot: string;
+  summary?: string;
 }
 
 export interface TopicsData {

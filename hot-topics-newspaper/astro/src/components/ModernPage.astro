@@ -13,7 +13,7 @@ const ai = data.ai;
 
 const heroLabels: Record<string, string> = { entertainment: '娱乐', digital: '数码', ai: 'AI' };
 const heroItem = ent[0];
-const heroBody = heroItem ? `${heroItem.title.slice(0, 50)}——这是今日最受关注的话题，引发全网热烈讨论。` : '';
+const heroBody = heroItem?.summary || (heroItem ? `${heroItem.title.slice(0, 50)}——今日最受关注的话题。` : '');
 
 function cardClass(rank: number): string {
   if (rank >= 1 && rank <= 3) return 'm-card rank-top' + rank;

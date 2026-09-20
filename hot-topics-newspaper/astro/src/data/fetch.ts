@@ -1,5 +1,6 @@
 import type { TopicsData } from './demo';
 import DEMO_DATA from './demo';
+import { extractSummaries } from './extract';
 
 const HEADERS = {
   'User-Agent':
@@ -53,11 +54,16 @@ async function fetchDigital() {
     for (const item of data?.Result ?? []) {
       const title = item.title ?? '';
       if (!title) continue;
+      // Use the description from API directly as summary
+      const desc = item.description ?? '';
+      const itemUrl = item.url ?? '';
+      const fullUrl = itemUrl.startsWith('http') ? itemUrl : `https://www.ithome.com${itemUrl}`;
       items.push({
         rank,
         title,
-        url: `https://www.ithome.com/0/${item.newsid}.htm`,
+        url: fullUrl,
         hot: '',
+        summary: desc || undefined,
       });
       if (++rank > 10) break;
     }
@@ -97,5 +103,16 @@ export async function fetchTopics(): Promise<TopicsData> {
     fetchDigital(),
     fetchAI(),
   ]);
+
+  // Extract real summaries from article pages (batched, concurrent)
+  const allItems = [...entertainment, ...digital, ...ai];
+  const summaries = await extractSummaries(allItems);
+  let idx = 0;
+  for (const arr of [entertainment, digital, ai]) {
+    for (const item of arr) {
+      item.summary = summaries[idx++];
+    }
+  }
+
   return { entertainment, digital, ai };
 }

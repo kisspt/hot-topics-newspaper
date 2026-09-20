@@ -1,6 +1,5 @@
 ---
 import type { TopicsData } from '../data/demo';
-import { shortLead, featureBodyLong } from '../data/leads';
 
 interface Props {
   items: TopicsData['entertainment'];
@@ -17,7 +16,7 @@ const { items, icon, kicker, dekSeed } = Astro.props;
       <div class="v-sechead">
         <div class="v-kicker">{kicker}</div>
         <h2 class="v-feature-title"><a href={top.url} target="_blank">{top.title}</a></h2>
-        <div class="v-sechead-dek">{shortLead(dekSeed)}</div>
+        <div class="v-sechead-dek">{top.summary || top.title}</div>
       </div>
       <figure class="v-illus">
         <svg viewBox="0 0 64 64"><use href={`#${icon}`} /></svg>
@@ -27,12 +26,12 @@ const { items, icon, kicker, dekSeed } = Astro.props;
         热点追踪 ● 现场报道
         {top.hot && <span class="v-heat">热度 {top.hot}</span>}
       </div>
-      <div class="v-body drop">{featureBodyLong(dekSeed)}</div>
+      <div class="v-body drop">{top.summary || top.title}</div>
       <div class="v-columns">
         {items.slice(1, 10).map((it, i) => (
           <div class="v-news" key={it.rank}>
             <div class="v-news-title"><a href={it.url} target="_blank">{it.title}</a></div>
-            <div class="v-news-body">{shortLead(dekSeed + i + 1)}</div>
+            <div class="v-news-body">{it.summary || it.title}</div>
             {it.hot && <div class="v-news-meta">{it.hot}</div>}
           </div>
         ))}
