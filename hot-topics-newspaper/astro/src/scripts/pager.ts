@@ -95,8 +95,8 @@ if (stage) {
     }, 700);
   }
 
-  prevBtn.addEventListener('click', () => go(cur - 1));
-  nextBtn.addEventListener('click', () => go(cur + 1));
+  prevBtn.addEventListener('click', () => { go(cur - 1); prevBtn.blur(); });
+  nextBtn.addEventListener('click', () => { go(cur + 1); nextBtn.blur(); });
 
   document.addEventListener('keydown', (e) => {
     if (document.body.className !== 'vintage') return;

@@ -327,8 +327,12 @@ body.modern ::-webkit-scrollbar-corner { background: transparent; }
 .v-pager button.nav {
     width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(184,168,138,0.4);
     background: transparent; color: #e8dcc0; cursor: pointer; font-size: 18px; line-height: 1;
-    display: grid; place-items: center; transition: all .2s ease;
+    display: grid; place-items: center; transition: background .2s ease, border-color .2s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
+.v-pager button.nav:focus { outline: none; box-shadow: none; }
+.v-pager button.nav:active:not(:disabled) { background: rgba(139,26,26,0.3); }
 @media (hover: hover) {
   .v-pager button.nav:hover:not(:disabled) { background: #8b1a1a; border-color: #8b1a1a; color: #fff; }
 }
