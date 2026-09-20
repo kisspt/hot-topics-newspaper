@@ -1,0 +1,39 @@
+# 依赖
+node_modules/
+.next/
+dist/
+build/
+
+# 敏感文件
+.env
+.env.*
+*.key
+*.pem
+server.key
+
+# 工具配置
+.qoder/
+.superpowers/
+.git.bak/
+
+# 临时控制台截图
+aliyun_*.png
+bailian_*.png
+mse_console.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Astro 缓存
+.astro/
+
+# 临时服务目录
+_react-serve/
+dist-compare/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store

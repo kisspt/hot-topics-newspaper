@@ -1,0 +1,107 @@
+---
+import type { TopicsData } from '../data/demo';
+
+interface Props {
+  data: TopicsData;
+  dateStr: string;
+  generatedAt: string;
+}
+const { data, dateStr, generatedAt } = Astro.props;
+const ent = data.entertainment;
+const dig = data.digital;
+const ai = data.ai;
+
+const heroLabels: Record<string, string> = { entertainment: '娱乐', digital: '数码', ai: 'AI' };
+const heroItem = ent[0];
+const heroBody = heroItem ? `${heroItem.title.slice(0, 50)}——这是今日最受关注的话题，引发全网热烈讨论。` : '';
+
+function cardClass(rank: number): string {
+  if (rank >= 1 && rank <= 3) return 'm-card rank-top' + rank;
+  return 'm-card';
+}
+---
+<div class="modern-page">
+  <header class="m-header">
+    <div>
+      <h1>热点日报</h1>
+      <p class="m-tagline">每日热点 · 一文尽览</p>
+    </div>
+    <div class="m-header-right">
+      <div class="m-date">{dateStr}</div>
+      <div>{generatedAt}</div>
+    </div>
+  </header>
+
+  {heroItem && (
+    <div class="m-hero">
+      <div class="m-hero-number">01</div>
+      <div class="m-hero-content">
+        <span class="m-hero-badge entertainment">{heroLabels['entertainment']} · TOP</span>
+        <div class="m-hero-title"><a href={heroItem.url} target="_blank">{heroItem.title}</a></div>
+        <div class="m-hero-body">{heroBody}</div>
+        {heroItem.hot && <div class="m-hero-heat">{heroItem.hot}</div>}
+      </div>
+    </div>
+  )}
+
+  <section class="m-section">
+    <div class="m-section-header">
+      <div class="m-section-dot entertainment"></div>
+      <h2>娱乐</h2>
+      <span class="m-section-count">TOP 10</span>
+    </div>
+    <div class="m-grid">
+      {ent.map((it) => (
+        <div class={cardClass(it.rank)}>
+          <div class="m-card-num">{it.rank}</div>
+          <div class="m-card-body">
+            <div class="m-card-title"><a href={it.url} target="_blank">{it.title}</a></div>
+            {it.hot && <div class="m-card-heat">{it.hot}</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="m-section">
+    <div class="m-section-header">
+      <div class="m-section-dot digital"></div>
+      <h2>数码</h2>
+      <span class="m-section-count">TOP 10</span>
+    </div>
+    <div class="m-grid">
+      {dig.map((it) => (
+        <div class={cardClass(it.rank)}>
+          <div class="m-card-num">{it.rank}</div>
+          <div class="m-card-body">
+            <div class="m-card-title"><a href={it.url} target="_blank">{it.title}</a></div>
+            {it.hot && <div class="m-card-heat">{it.hot}</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="m-section">
+    <div class="m-section-header">
+      <div class="m-section-dot ai"></div>
+      <h2>AI</h2>
+      <span class="m-section-count">TOP 10</span>
+    </div>
+    <div class="m-grid">
+      {ai.map((it) => (
+        <div class={cardClass(it.rank)}>
+          <div class="m-card-num">{it.rank}</div>
+          <div class="m-card-body">
+            <div class="m-card-title"><a href={it.url} target="_blank">{it.title}</a></div>
+            {it.hot && <div class="m-card-heat">{it.hot}</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <footer class="m-footer">
+    <p>Generated at {generatedAt} · Data from public sources</p>
+  </footer>
+</div>

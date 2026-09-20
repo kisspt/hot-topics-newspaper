@@ -1,0 +1,23 @@
+---
+import type { TopicsData } from '../data/demo';
+import { shortLead, featureBodyLong } from '../data/leads';
+
+interface Props {
+  item: TopicsData['entertainment'][0];
+}
+const { item } = Astro.props;
+---
+<div class="v-kicker">★ 今日头条 · Breaking ★</div>
+<h2 class="v-feature-title"><a href={item.url} target="_blank">{item.title}</a></h2>
+<div class="v-dek">{shortLead(0)}</div>
+<div class="v-byline">
+  本报记者 ● 发自热点现场
+  {item.hot && <span class="v-heat">热度 {item.hot}</span>}
+</div>
+<figure class="v-illus">
+  <svg viewBox="0 0 64 64"><use href="#ic-quill" /></svg>
+  <figcaption>The Daily Scoop 插画</figcaption>
+</figure>
+<div class="v-body drop">{featureBodyLong(0)}</div>
+<div class="v-body">{featureBodyLong(5)}</div>
+<div class="v-continue">未完待续，详见本报相关版面 →</div>

@@ -1,0 +1,45 @@
+---
+import type { TopicsData } from '../data/demo';
+
+interface Props {
+  ent: TopicsData['entertainment'];
+  dig: TopicsData['digital'];
+  ai: TopicsData['ai'];
+}
+const { ent, dig, ai } = Astro.props;
+---
+<div class="v-brief-grid">
+  <div class="v-brief-cat">
+    <h3>娱乐 · Entertainment</h3>
+    {ent.map((it) => (
+      <div class="v-brief-item" key={it.rank}>
+        <div class="v-news-title">
+          <a href={it.url} target="_blank">{it.title}</a>
+          {it.hot && <span style="color:#8a7a66"> · {it.hot}</span>}
+        </div>
+      </div>
+    ))}
+  </div>
+  <div class="v-brief-cat">
+    <h3>数码 · Digital</h3>
+    {dig.map((it) => (
+      <div class="v-brief-item" key={it.rank}>
+        <div class="v-news-title">
+          <a href={it.url} target="_blank">{it.title}</a>
+          {it.hot && <span style="color:#8a7a66"> · {it.hot}</span>}
+        </div>
+      </div>
+    ))}
+  </div>
+  <div class="v-brief-cat">
+    <h3>智能 · Intelligence</h3>
+    {ai.map((it) => (
+      <div class="v-brief-item" key={it.rank}>
+        <div class="v-news-title">
+          <a href={it.url} target="_blank">{it.title}</a>
+          {it.hot && <span style="color:#8a7a66"> · {it.hot}</span>}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

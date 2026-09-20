@@ -1,0 +1,185 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SVGSprites from '../components/SVGSprites.astro';
+import ThemeSwitch from '../components/ThemeSwitch.astro';
+import FrontLead from '../components/FrontLead.astro';
+import SectionIndex from '../components/SectionIndex.astro';
+import SectionPage from '../components/SectionPage.astro';
+import BriefPage from '../components/BriefPage.astro';
+import ModernPage from '../components/ModernPage.astro';
+import { fetchTopics } from '../data/fetch';
+import DEMO_DATA from '../data/demo';
+
+// Fetch data at build time (falls back to DEMO_DATA on failure)
+let data;
+try {
+  data = await fetchTopics();
+} catch {
+  data = DEMO_DATA;
+}
+
+const now = new Date();
+const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+const issueNo = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+
+const ent = data.entertainment;
+const dig = data.digital;
+const ai = data.ai;
+---
+<BaseLayout title="热点日报 · THE DAILY SCOOP" dateStr={dateStr}>
+
+  <!-- SVG sprite definitions -->
+  <SVGSprites />
+
+  <!-- Theme switcher -->
+  <ThemeSwitch />
+
+  <!-- ==================== VINTAGE LAYOUT (multi-page) ==================== -->
+  <div class="vintage-page">
+    <div class="v-stage" id="vStage">
+
+      <!-- ===== PAGE 1 · FRONT ===== -->
+      <section class="v-sheet active" data-name="头版" data-en="Front Page">
+        <div class="v-paper">
+          <div class="v-topbar">
+            <div class="v-topbar-left"><span>☀ Weather Edition</span><span>FINAL EDITION</span></div>
+            <div class="v-topbar-right"><span>LATE CITY EDITION</span><span>{dateStr}</span></div>
+          </div>
+          <div class="v-masthead-rule"></div>
+          <header class="v-masthead">
+            <div class="v-masthead-ornament">✦ ✦ ✦</div>
+            <h1 class="v-masthead-title">The Daily Scoop</h1>
+            <p class="v-masthead-tagline">热点日报 · All the Hot News That's Fit to Print</p>
+          </header>
+          <div class="v-info-bar">
+            <span>VOL. MMXXVI · NO. {issueNo}</span>
+            <span class="v-date-center">{dateStr}</span>
+            <span>PRICE: FREE · LATE EDITION</span>
+          </div>
+          <div class="v-banner"><div class="v-banner-inner"><span class="v-banner-text">Extra Extra — All the Trending News</span></div></div>
+          <div class="v-banner-rule"></div>
+
+          <div class="v-lead-grid">
+            <div class="v-lead-main">
+              {ent[0] && <FrontLead item={ent[0]} />}
+            </div>
+            <aside class="v-lead-side">
+              <div class="v-box">
+                <div class="v-box-title">In This Issue · 本版要目</div>
+                <ul class="v-index" id="vIndex">
+                  <SectionIndex />
+                </ul>
+              </div>
+              <div class="v-box">
+                <div class="v-box-title">Almanac · 今日一览</div>
+                <div class="v-almanac">
+                  <svg viewBox="0 0 120 24" style="width:100%;height:auto;color:#8a7a66"><use href="#ic-fleuron" /></svg>
+                  <div><b>日期</b> {dateStr}</div>
+                  <div><b>期号</b> 第 {issueNo} 号</div>
+                  <div><b>生成</b> {timeStr}</div>
+                  <div><b>来源</b> 公开热榜 API</div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE 2 · ENTERTAINMENT ===== -->
+      <section class="v-sheet" data-name="娱乐" data-en="Entertainment">
+        <div class="v-paper">
+          <div class="v-runhead">
+            <span class="v-runhead-name">The Daily Scoop</span>
+            <span class="v-runhead-page">PAGE TWO · ENTERTAINMENT</span>
+            <span>{dateStr}</span>
+          </div>
+          <div class="v-pagebody">
+            <div class="v-fit">
+              <SectionPage items={ent} icon="ic-masks" kicker="娱乐热点 · Entertainment & Show Business" dekSeed={1} />
+            </div>
+          </div>
+          <div class="v-footer"><div class="v-footer-ornament">— ✦ —</div><p>ENTERTAINMENT · 娱乐热点</p></div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE 3 · DIGITAL ===== -->
+      <section class="v-sheet" data-name="数码" data-en="Digital &amp; Tech">
+        <div class="v-paper">
+          <div class="v-runhead">
+            <span class="v-runhead-name">The Daily Scoop</span>
+            <span class="v-runhead-page">PAGE THREE · DIGITAL &amp; TECH</span>
+            <span>{dateStr}</span>
+          </div>
+          <div class="v-pagebody">
+            <div class="v-fit">
+              <SectionPage items={dig} icon="ic-gear" kicker="数码前沿 · Digital & Tech" dekSeed={4} />
+            </div>
+          </div>
+          <div class="v-footer"><div class="v-footer-ornament">— ✦ —</div><p>DIGITAL · 数码前沿</p></div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE 4 · INTELLIGENCE ===== -->
+      <section class="v-sheet" data-name="智能" data-en="Intelligence">
+        <div class="v-paper">
+          <div class="v-runhead">
+            <span class="v-runhead-name">The Daily Scoop</span>
+            <span class="v-runhead-page">PAGE FOUR · INTELLIGENCE</span>
+            <span>{dateStr}</span>
+          </div>
+          <div class="v-pagebody">
+            <div class="v-fit">
+              <SectionPage items={ai} icon="ic-brain" kicker="智能时代 · Artificial Intelligence" dekSeed={7} />
+            </div>
+          </div>
+          <div class="v-footer"><div class="v-footer-ornament">— ✦ —</div><p>INTELLIGENCE · 智能时代</p></div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE 5 · BRIEFS ===== -->
+      <section class="v-sheet" data-name="简讯" data-en="Briefs">
+        <div class="v-paper">
+          <div class="v-runhead">
+            <span class="v-runhead-name">The Daily Scoop</span>
+            <span class="v-runhead-page">PAGE FIVE · CITY IN BRIEF</span>
+            <span>{dateStr}</span>
+          </div>
+          <div class="v-pagebody">
+            <div class="v-fit">
+              <div class="v-sechead">
+                <div class="v-kicker">City in Brief · 一日要闻速览</div>
+                <h2 class="v-sechead-title">今日全部热点 · 一览无余</h2>
+                <div class="v-sechead-dek">以下为本日报今日收录的全部榜单要闻，供读者快速浏览。</div>
+              </div>
+              <BriefPage ent={ent} dig={dig} ai={ai} />
+            </div>
+          </div>
+          <div class="v-footer">
+            <div class="v-footer-ornament">— ✦ —</div>
+            <p>THE DAILY SCOOP · 热点日报 · Est. 2026</p>
+            <p style="margin-top:4px">今日热点由自动抓取 · 数据来源于公开 API · 生成于 {timeStr}</p>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /v-stage -->
+
+    <!-- page-turn navigation -->
+    <nav class="v-pager" id="vPager" aria-label="报纸版面导航">
+      <button class="nav" id="vPrev" aria-label="上一页">‹</button>
+      <div class="v-pager-label">
+        <span class="v-pager-name" id="vPageName">头版</span>
+        <span class="v-pager-count" id="vPageCount">第 1 版 / 共 5 版</span>
+      </div>
+      <div class="v-dots" id="vDots"></div>
+      <button class="nav" id="vNext" aria-label="下一页">›</button>
+    </nav>
+  </div>
+
+  <!-- ==================== MODERN LAYOUT ==================== -->
+  <ModernPage data={data} dateStr={dateStr} generatedAt={timeStr} />
+
+  <!-- Client-side scripts -->
+  <script src="../scripts/pager.ts"></script>
+</BaseLayout>

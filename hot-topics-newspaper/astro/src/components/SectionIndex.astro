@@ -1,0 +1,17 @@
+---
+interface Props {
+  onGoto?: string; // not used in static — index items use data-goto
+}
+const specs: [string, string, number][] = [
+  ['娱乐热点', 'Entertainment', 1],
+  ['数码前沿', 'Digital & Tech', 2],
+  ['智能时代', 'Intelligence', 3],
+  ['一日要闻', 'City in Brief', 4],
+];
+---
+{specs.map(([name, en, goto]) => (
+  <li data-goto={goto}>
+    <div class="v-index-head">{name}</div>
+    <div class="v-index-meta"><span>{en}</span><span>第 {goto + 1} 版 →</span></div>
+  </li>
+))}

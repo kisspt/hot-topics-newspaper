@@ -1,0 +1,27 @@
+---
+/* Theme switcher — vintage / modern toggle */
+---
+<div class="theme-switch">
+  <button class="active" data-theme="vintage">复古</button>
+  <button data-theme="modern">现代</button>
+</div>
+
+<script>
+  function setTheme(t: string) {
+    document.body.className = t;
+    document.querySelectorAll('.theme-switch button').forEach((b) => {
+      const btn = b as HTMLButtonElement;
+      btn.classList.toggle('active', btn.dataset.theme === t);
+    });
+    localStorage.setItem('newspaper-theme', t);
+  }
+
+  // Restore saved theme
+  const saved = localStorage.getItem('newspaper-theme');
+  if (saved) setTheme(saved);
+
+  // Delegate clicks
+  document.querySelectorAll('.theme-switch button').forEach((btn) => {
+    btn.addEventListener('click', () => setTheme((btn as HTMLButtonElement).dataset.theme!));
+  });
+</script>
